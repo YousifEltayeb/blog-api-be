@@ -1,0 +1,46 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+    provider = "prisma-client-js"
+    output   = "../generated/prisma"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DB_URL")
+}
+model Author {
+
+    id       Int      @id @default(autoincrement())
+    name String
+    email    String   @unique
+    password String
+@@map("author")
+}
+
+// all posts belong to one author (as per the requiremnt that I made up)
+// so no need to add a relation
+model Post {
+    id       Int      @id @default(autoincrement())
+    title String
+    content String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    published Boolean @default(false)
+    comments Comment[]
+@@map("posts")
+}
+
+model Comment {
+    id       Int      @id @default(autoincrement())
+    name String
+    content String
+    createdAt DateTime @default(now())
+    post Post @relation(fields: [postId], references: [id])
+    postId Int @unique
+@@map("comments")
+    }
