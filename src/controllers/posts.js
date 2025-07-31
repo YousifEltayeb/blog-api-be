@@ -6,9 +6,32 @@ const {
   validateUpdatePost,
 } = require("../config/validation");
 
-exports.getPosts = async (req, res) => {
-  res.send("posts, lots, lots, lots of posts");
-};
+exports.getPosts = [
+  function (req, res, next) {
+    passport.authenticate(
+      "jwt",
+      { session: false },
+      async (err, user, info) => {
+        if (err) {
+          return res
+            .status(500)
+            .json({ message: "Authentication error", error: err.message });
+        }
+        // if user logged in
+        if (user) {
+          const posts = await prisma.post.findMany();
+          return res.json({ posts });
+        }
+        return next();
+      },
+    )(req, res, next);
+  },
+  async (req, res) => {
+    // if not logged in should return only published posts
+    const posts = await prisma.post.findMany({ where: { published: true } });
+    res.json({ posts });
+  },
+];
 exports.createPost = [
   passport.authenticate("jwt", { session: false }),
   validateCreatePost,
