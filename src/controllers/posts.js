@@ -55,9 +55,9 @@ exports.getSinglePost = [
         // if user logged in
         if (user) {
           try {
-            const postId = req.params;
+            const { postId } = req.params;
             const post = await prisma.post.findUnique({
-              where: { id: postId },
+              where: { id: Number(postId) },
             });
             return res.json({ post });
           } catch (error) {
@@ -71,9 +71,17 @@ exports.getSinglePost = [
   async (req, res) => {
     // if not logged in should return only published posts
     try {
-      const postId = req.params;
-      const post = await prisma.post.findUnique({ where: { id: postId } });
-      res.json({ post });
+      const { postId } = req.params;
+      const post = await prisma.post.findUnique({
+        where: { id: Number(postId) },
+      });
+      if (post.published) {
+        res.json({ post });
+      } else {
+        res
+          .status(401)
+          .json({ error: "You're unauthorized to access this post" });
+      }
     } catch (error) {
       res.status(404).json({ error });
     }
@@ -132,6 +140,21 @@ exports.updatePost = [
         data: { title, content, published: status },
       });
       res.status(201).json({ Success: "post updated" });
+    } catch (error) {
+      res.status(500).json({ error: error });
+    }
+  },
+];
+
+exports.deletePost = [
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    try {
+      const { postId } = req.params;
+      await prisma.post.delete({
+        where: { id: Number(postId) },
+      });
+      res.status(200).json({ sucess: "deleted successfuly" });
     } catch (error) {
       res.status(500).json({ error: error });
     }
