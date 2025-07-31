@@ -7,6 +7,6 @@ posts.post("/", postsController.createPost);
 posts.get("/:postId", postsController.getSinglePost);
 posts.put("/:postId", postsController.updatePost);
 posts.delete("/:postId", postsController.deletePost);
-posts.get("/:postId/comments", postsController.deletePost);
+posts.get("/:postId/comments", postsController.getPostComments);
 
 module.exports = posts;

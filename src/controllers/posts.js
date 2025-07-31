@@ -160,3 +160,21 @@ exports.deletePost = [
     }
   },
 ];
+
+exports.getPostComments = [
+  async (req, res) => {
+    console.log("hi");
+    try {
+      const { postId } = req.params;
+      const comments = await prisma.post.findUnique({
+        where: { id: Number(postId) },
+        select: {
+          comments: true,
+        },
+      });
+      res.status(200).json(comments);
+    } catch (error) {
+      res.status(500).json({ error: error });
+    }
+  },
+];

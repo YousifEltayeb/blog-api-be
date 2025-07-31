@@ -24,15 +24,6 @@ const validateCreatePost = [
 ];
 
 const validateUpdatePost = [
-  body("postId")
-    .exists()
-    .withMessage(`Post ID ${existErr}`)
-    .bail()
-    .trim()
-    .notEmpty()
-    .withMessage(`Post ID ${emptyErr}`)
-    .bail()
-    .isString(),
   body("title")
     .optional({ values: "falsy" })
     .exists()
@@ -69,9 +60,29 @@ const validateUpdatePost = [
       }
     }),
 ];
-
+const validateComment = [
+  body("name")
+    .exists()
+    .withMessage(`Name ${existErr}`)
+    .bail()
+    .trim()
+    .notEmpty()
+    .withMessage(`Name ${emptyErr}`)
+    .bail()
+    .isString(),
+  body("content")
+    .exists()
+    .withMessage(`Contnet ${existErr}`)
+    .bail()
+    .trim()
+    .notEmpty()
+    .withMessage(`Content ${emptyErr}`)
+    .bail()
+    .isString(),
+];
 module.exports = {
   validateCreatePost,
   validationResult,
   validateUpdatePost,
+  validateComment,
 };
