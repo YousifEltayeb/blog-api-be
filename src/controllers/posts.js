@@ -19,8 +19,12 @@ exports.getPosts = [
         }
         // if user logged in
         if (user) {
-          const posts = await prisma.post.findMany();
-          return res.json({ posts });
+          try {
+            const posts = await prisma.post.findMany();
+            return res.json({ posts });
+          } catch (error) {
+            res.status(404).json({ error });
+          }
         }
         return next();
       },
@@ -28,10 +32,54 @@ exports.getPosts = [
   },
   async (req, res) => {
     // if not logged in should return only published posts
-    const posts = await prisma.post.findMany({ where: { published: true } });
-    res.json({ posts });
+    try {
+      const posts = await prisma.post.findMany({ where: { published: true } });
+      res.json({ posts });
+    } catch (error) {
+      res.status(404).json({ error });
+    }
   },
 ];
+
+exports.getSinglePost = [
+  function (req, res, next) {
+    passport.authenticate(
+      "jwt",
+      { session: false },
+      async (err, user, info) => {
+        if (err) {
+          return res
+            .status(500)
+            .json({ message: "Authentication error", error: err.message });
+        }
+        // if user logged in
+        if (user) {
+          try {
+            const postId = req.params;
+            const post = await prisma.post.findUnique({
+              where: { id: postId },
+            });
+            return res.json({ post });
+          } catch (error) {
+            res.status(404).json({ error });
+          }
+        }
+        return next();
+      },
+    )(req, res, next);
+  },
+  async (req, res) => {
+    // if not logged in should return only published posts
+    try {
+      const postId = req.params;
+      const post = await prisma.post.findUnique({ where: { id: postId } });
+      res.json({ post });
+    } catch (error) {
+      res.status(404).json({ error });
+    }
+  },
+];
+
 exports.createPost = [
   passport.authenticate("jwt", { session: false }),
   validateCreatePost,
@@ -65,7 +113,8 @@ exports.updatePost = [
       });
     }
     try {
-      const { postId, title, content } = req.body;
+      const { postId } = req.params;
+      const { title, content } = req.body;
       let { status } = req.body;
 
       // because prisma uses typescript

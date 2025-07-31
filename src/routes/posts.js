@@ -4,6 +4,7 @@ const postsController = require("../controllers/posts");
 
 posts.get("/", postsController.getPosts);
 posts.post("/", postsController.createPost);
-posts.put("/", postsController.updatePost);
+posts.get("/:postId", postsController.getSinglePost);
+posts.put("/:postId", postsController.updatePost);
 
 module.exports = posts;
