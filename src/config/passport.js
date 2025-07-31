@@ -5,7 +5,6 @@ const prisma = require("../config/prismaClient");
 
 const JwtStrategy = require("passport-jwt").Strategy;
 const ExtractJwt = require("passport-jwt").ExtractJwt;
-
 const customFields = {
   usernameField: "email",
 };
@@ -34,16 +33,20 @@ const opts = {};
 opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 opts.secretOrKey = process.env.SECRET;
 passport.use(
-  new JwtStrategy(opts, function (jwt_payload, done) {
-    User.findOne({ id: jwt_payload.sub }, function (err, user) {
-      if (err) {
-        return done(err, false);
-      }
-      if (user) {
-        return done(null, user);
+  new JwtStrategy(opts, async function (jwt_payload, done) {
+    try {
+      const author = await prisma.author.findUnique({
+        where: {
+          id: jwt_payload.user.id,
+        },
+      });
+      if (author) {
+        return done(null, author);
       } else {
         return done(null, false);
       }
-    });
+    } catch (error) {
+      return done(error, false);
+    }
   }),
 );

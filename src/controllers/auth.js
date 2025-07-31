@@ -5,13 +5,17 @@ require("dotenv").config();
 exports.login = [
   function (req, res, next) {
     passport.authenticate("jwt", { session: false }, (err, user, info) => {
-      // only allow the user to login if he doesn't have a valid token
-      if (user === false) {
-        return next();
-      } else {
-        console.log("already signed in");
-        res.redirect("/api/v1/posts");
+      if (err) {
+        return res
+          .status(500)
+          .json({ message: "Authentication error", error: err.message });
       }
+      // only allow the user to login if he doesn't have a valid token
+      if (!user) {
+        return next();
+      }
+      console.log("already signed in");
+      res.redirect("/api/v1/posts");
     })(req, res, next);
   },
   passport.authenticate("local", { session: false }),
@@ -19,7 +23,7 @@ exports.login = [
     jwt.sign(
       { user: { id: req.user.id, name: req.user.name, email: req.user.email } },
       process.env.SECRET,
-      { expiresIn: "30m" },
+      { expiresIn: "1d" },
 
       function (err, token) {
         if (err) return res.status(500).json({ err: "unable to create token" });
