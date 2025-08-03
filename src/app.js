@@ -2,13 +2,13 @@ const express = require("express");
 const app = express();
 require("dotenv").config();
 const PORT = process.env.PORT;
-const passport = require("passport");
-const prisma = require("./config/prismaClient");
 const API_VERSION = "/api/v1";
 const routes = require("./routes/index");
+const cors = require("cors");
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(cors());
 
 // passport config
 require("./config/passport");

@@ -21,7 +21,7 @@ exports.getPosts = [
         if (user) {
           try {
             const posts = await prisma.post.findMany();
-            return res.json({ posts });
+            return res.json(posts);
           } catch (error) {
             res.status(404).json({ error });
           }
@@ -34,7 +34,7 @@ exports.getPosts = [
     // if not logged in should return only published posts
     try {
       const posts = await prisma.post.findMany({ where: { published: true } });
-      res.json({ posts });
+      res.json(posts);
     } catch (error) {
       res.status(404).json({ error });
     }
@@ -59,7 +59,7 @@ exports.getSinglePost = [
             const post = await prisma.post.findUnique({
               where: { id: Number(postId) },
             });
-            return res.json({ post });
+            return res.json(post);
           } catch (error) {
             res.status(404).json({ error });
           }
@@ -76,7 +76,7 @@ exports.getSinglePost = [
         where: { id: Number(postId) },
       });
       if (post.published) {
-        res.json({ post });
+        res.json(post);
       } else {
         res
           .status(401)
