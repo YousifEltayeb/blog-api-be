@@ -128,8 +128,6 @@ exports.updatePost = [
       let { status } = req.body;
 
       // because prisma uses typescript
-      // if (status === "true") status = true;
-      // if (status === "false") status = false;
       status === "true" ? (status = true) : (status = false);
 
       if (!title && !content && status === undefined) {
@@ -159,24 +157,6 @@ exports.deletePost = [
         where: { id: Number(postId) },
       });
       res.status(200).json({ sucess: "deleted successfuly" });
-    } catch (error) {
-      res.status(500).json({ error: error });
-    }
-  },
-];
-
-exports.getPostComments = [
-  async (req, res) => {
-    console.log("hi");
-    try {
-      const { postId } = req.params;
-      const comments = await prisma.post.findUnique({
-        where: { id: Number(postId) },
-        select: {
-          comments: true,
-        },
-      });
-      res.status(200).json(comments);
     } catch (error) {
       res.status(500).json({ error: error });
     }
