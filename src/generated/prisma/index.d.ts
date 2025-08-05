@@ -4591,15 +4591,15 @@ export namespace Prisma {
 
   export type CommentWhereUniqueInput = Prisma.AtLeast<{
     id?: number
-    postId?: number
     AND?: CommentWhereInput | CommentWhereInput[]
     OR?: CommentWhereInput[]
     NOT?: CommentWhereInput | CommentWhereInput[]
     name?: StringFilter<"Comment"> | string
     content?: StringFilter<"Comment"> | string
     createdAt?: DateTimeFilter<"Comment"> | Date | string
+    postId?: IntFilter<"Comment"> | number
     post?: XOR<PostScalarRelationFilter, PostWhereInput>
-  }, "id" | "postId">
+  }, "id">
 
   export type CommentOrderByWithAggregationInput = {
     id?: SortOrder

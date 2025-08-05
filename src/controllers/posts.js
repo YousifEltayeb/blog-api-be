@@ -58,10 +58,11 @@ exports.getSinglePost = [
             const { postId } = req.params;
             const post = await prisma.post.findUnique({
               where: { id: Number(postId) },
+              include: { comments: true },
             });
             return res.json(post);
           } catch (error) {
-            res.status(404).json({ error });
+            res.status(404).json(error);
           }
         }
         return next();
@@ -74,6 +75,7 @@ exports.getSinglePost = [
       const { postId } = req.params;
       const post = await prisma.post.findUnique({
         where: { id: Number(postId) },
+        include: { comments: true },
       });
       if (post.published) {
         res.json(post);
@@ -126,9 +128,11 @@ exports.updatePost = [
       let { status } = req.body;
 
       // because prisma uses typescript
+      // if (status === "true") status = true;
+      // if (status === "false") status = false;
       status === "true" ? (status = true) : (status = false);
 
-      if (!title && !content && !status) {
+      if (!title && !content && status === undefined) {
         return res
           .status(400)
           .json({ error: "you must provide at least one field to update" });

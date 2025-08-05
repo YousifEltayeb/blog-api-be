@@ -14,8 +14,7 @@ exports.login = [
       if (!user) {
         return next();
       }
-      console.log("already signed in");
-      res.redirect("/api/v1/posts");
+      res.status(200).json("Already logged in");
     })(req, res, next);
   },
   passport.authenticate("local", { session: false }),
