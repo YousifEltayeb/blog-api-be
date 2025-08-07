@@ -41,7 +41,7 @@ model Comment {
     name      String
     content   String
     createdAt DateTime @default(now())
-    post      Post     @relation(fields: [postId], references: [id])
+    post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
     postId    Int
 
     @@map("comments")
