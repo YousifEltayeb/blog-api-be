@@ -1,6 +1,8 @@
 const passport = require("passport");
 const prisma = require("../config/prismaClient");
 const { validateComment, validationResult } = require("../config/validation");
+
+// TODO: add pagination, sorting, filtering
 exports.getComments = [
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {

@@ -6,6 +6,7 @@ const API_VERSION = "/api/v1";
 const routes = require("./routes/index");
 const cors = require("cors");
 
+// TODO: add FE origin after deployment
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());

@@ -3,6 +3,7 @@ const passport = require("passport");
 require("dotenv").config();
 
 exports.login = [
+  // only allow the user to login if he doesn't have a valid token
   function (req, res, next) {
     passport.authenticate("jwt", { session: false }, (err, user, info) => {
       if (err) {
@@ -10,7 +11,6 @@ exports.login = [
           .status(500)
           .json({ message: "Authentication error", error: err.message });
       }
-      // only allow the user to login if he doesn't have a valid token
       if (!user) {
         return next();
       }

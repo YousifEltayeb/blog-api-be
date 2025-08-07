@@ -1,3 +1,4 @@
+// local and jwt stratiges config
 const passport = require("passport");
 const bcrypt = require("bcryptjs");
 const LocalStrategy = require("passport-local").Strategy;

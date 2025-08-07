@@ -6,7 +6,9 @@ const {
   validateUpdatePost,
 } = require("../config/validation");
 
+// TODO: add pagination, sorting, filtering
 exports.getPosts = [
+  // if user is logged in, fetch all posts, otherwise fetch only published posts
   function (req, res, next) {
     passport.authenticate(
       "jwt",
@@ -17,7 +19,6 @@ exports.getPosts = [
             .status(500)
             .json({ message: "Authentication error", error: err.message });
         }
-        // if user logged in
         if (user) {
           try {
             const posts = await prisma.post.findMany();
@@ -42,6 +43,7 @@ exports.getPosts = [
 ];
 
 exports.getSinglePost = [
+  // if logged in return post without checking if published or not
   function (req, res, next) {
     passport.authenticate(
       "jwt",
@@ -52,7 +54,6 @@ exports.getSinglePost = [
             .status(500)
             .json({ message: "Authentication error", error: err.message });
         }
-        // if user logged in
         if (user) {
           try {
             const { postId } = req.params;
@@ -70,7 +71,7 @@ exports.getSinglePost = [
     )(req, res, next);
   },
   async (req, res) => {
-    // if not logged in should return only published posts
+    // if not logged check first if post published or not
     try {
       const { postId } = req.params;
       const post = await prisma.post.findUnique({
@@ -127,16 +128,16 @@ exports.updatePost = [
       const { title, content } = req.body;
       let { status } = req.body;
 
-      // because prisma uses typescript
+      // because prisma uses doesn't accept strings (typescript)
       status === "true" ? (status = true) : (status = false);
 
+      // all fields are optional, but at leaset one must be provided
       if (!title && !content && status === undefined) {
         return res
           .status(400)
           .json({ error: "you must provide at least one field to update" });
       }
 
-      // if valuse is undefined prisma will ignore it
       await prisma.post.update({
         where: { id: Number(postId) },
         data: { title, content, published: status },

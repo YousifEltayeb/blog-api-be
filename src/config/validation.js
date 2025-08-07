@@ -1,5 +1,6 @@
 const { body, validationResult } = require("express-validator");
 
+// validation for creating posts & comments and updating a post
 const emptyErr = "cannot be empty";
 const existErr = "field must exist";
 const validateCreatePost = [
