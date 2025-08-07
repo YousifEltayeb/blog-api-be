@@ -1,22 +1,28 @@
 # blog-api-be
 
 This backend serves two frontend applications:
-- **Author Frontend:** https://github.com/YousifEltayeb/blog-api-fe-author
-- **Visitor Frontend:** https://github.com/YousifEltayeb/blog-api-fe-visitor
+
+- **Author Frontend:** <https://github.com/YousifEltayeb/blog-api-fe-author>
+- **Visitor Frontend:** <https://github.com/YousifEltayeb/blog-api-fe-visitor>
 
 This is a backend API for a blog application.
 
 ## Installation
 
-1.  Clone the repository:
+1. Clone the repository:
+
     ```bash
     git clone https://github.com/your-username/blog-api-be.git
     ```
-2.  Navigate to the project directory:
+
+2. Navigate to the project directory:
+
     ```bash
     cd blog-api-be
     ```
-3.  Install dependencies:
+
+3. Install dependencies:
+
     ```bash
     npm install
     ```
@@ -51,9 +57,11 @@ npm start
 ## API Endpoints
 
 ### Authentication
+
 - `POST /auth/login`: User login
 
 ### Posts
+
 - `GET /posts`: Get all posts
 - `POST /posts`: Create a new post
 - `GET /posts/:postId`: Get a single post by ID
@@ -61,6 +69,7 @@ npm start
 - `DELETE /posts/:postId`: Delete a post by ID
 
 ### Comments
+
 - `GET /comments`: Get all comments
 - `POST /comments/:postId`: Create a new comment for a post
 - `DELETE /comments/:commentId`: Delete a comment by ID
