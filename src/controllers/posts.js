@@ -21,7 +21,9 @@ exports.getPosts = [
         }
         if (user) {
           try {
-            const posts = await prisma.post.findMany();
+            const posts = await prisma.post.findMany({
+              where: { authorId: user.id },
+            });
             return res.json(posts);
           } catch (error) {
             res.status(404).json({ error });
@@ -58,9 +60,11 @@ exports.getSinglePost = [
           try {
             const { postId } = req.params;
             const post = await prisma.post.findUnique({
-              where: { id: Number(postId) },
+              where: { id: Number(postId), authorId: user.id },
               include: { comments: true },
             });
+            if (!post)
+              return res.status(404).json({ message: "post Not found" });
             return res.json(post);
           } catch (error) {
             res.status(404).json(error);
@@ -104,7 +108,9 @@ exports.createPost = [
     }
     try {
       const { title, content } = req.body;
-      await prisma.post.create({ data: { title, content } });
+      await prisma.post.create({
+        data: { title, content, authorId: req.user.id },
+      });
       res.status(201).json({ Success: "post created" });
     } catch (error) {
       res.status(500).json({ error: error });
@@ -115,7 +121,7 @@ exports.createPost = [
 exports.updatePost = [
   passport.authenticate("jwt", { session: false }),
   validateUpdatePost,
-  async (req, res) => {
+  (req, res, next) => {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
@@ -123,13 +129,27 @@ exports.updatePost = [
         error: errors.array(),
       });
     }
+    next();
+  },
+  async (req, res, next) => {
+    const postId = parseInt(req.params.postId);
+    if (!postId) return res.status(400).json({ message: "Invalid params" });
+    const post = await prisma.post.findUnique({ where: { id: postId } });
+    if (!post) return res.status(404).json({ message: "post not found" });
+    //continue with the request if req.user.id === authorId
+    if (post.authorId === req.user.id) return next();
+    res.status(401).json({ message: "Unauthorized to update this post" });
+  },
+  async (req, res) => {
     try {
       const { postId } = req.params;
       const { title, content } = req.body;
       let { status } = req.body;
 
-      // because prisma uses doesn't accept strings (typescript)
-      status === "true" ? (status = true) : (status = false);
+      // because prisma doesn't accept strings (typescript)
+      if (status) {
+        status === "true" ? (status = true) : (status = false);
+      }
 
       // all fields are optional, but at leaset one must be provided
       if (!title && !content && status === undefined) {
@@ -151,6 +171,15 @@ exports.updatePost = [
 
 exports.deletePost = [
   passport.authenticate("jwt", { session: false }),
+  async (req, res, next) => {
+    const postId = parseInt(req.params.postId);
+    if (!postId) return res.status(400).json({ message: "Invalid params" });
+    const post = await prisma.post.findUnique({ where: { id: postId } });
+    if (!post) return res.status(404).json({ message: "post not found" });
+    //continue with the request if req.user.id === authorId
+    if (post.authorId === req.user.id) return next();
+    res.status(401).json({ message: "Unauthorized to delete this post" });
+  },
   async (req, res) => {
     try {
       const { postId } = req.params;
