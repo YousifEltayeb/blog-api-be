@@ -80,7 +80,14 @@ exports.getSinglePost = [
       const { postId } = req.params;
       const post = await prisma.post.findUnique({
         where: { id: Number(postId) },
-        include: { comments: true, Author: true },
+        include: {
+          comments: true,
+          Author: {
+            select: {
+              name: true,
+            },
+          },
+        },
       });
       if (post.published) {
         res.json(post);
